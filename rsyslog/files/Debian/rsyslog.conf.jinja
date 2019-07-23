@@ -1,0 +1,90 @@
+########################################################################
+# File managed by Salt at <salt://rsyslog/files/RedHat/rsyslog.conf.jinja>.
+# Your changes will be overwritten.
+########################################################################
+
+# rsyslog configuration file
+
+# For more information see /usr/share/doc/rsyslog-*/rsyslog_conf.html
+# If you experience problems, see http://www.rsyslog.com/doc/troubleshoot.html
+
+#################
+#### MODULES ####
+#################
+{%- if rsyslog.modules is defined %}
+{%- for module in rsyslog.modules %}
+{%- if module == 'impstats' -%}
+# Enable impstats.This module MUST be loaded right at the top of rsyslog.conf, otherwise stats may not get turned on in all places.
+module(
+        load="impstats"
+        interval="{{ config.impstatsinterval|default('600') }}"
+        severity="{{ config.impstatsseverity|default('6') }}"
+        resetCounters="{{ config.impstatsresetcounters|default('off') }}"
+        log.syslog="{{ config.impstatslogsyslog|default('on') }}"
+        format="{{ config.impstatsformat|default('legacy') }}"
+)
+{% if module.impstatslogsyslog is defined %}
+{{ module.impstatssyslogrule | default('syslog.=debug /var/log/rsyslog-stats') }}
+{%- endif %}
+{%- endif %}
+{%- endfor %}
+$ModLoad imuxsock # provides support for local system logging
+$ModLoad imklog   # provides kernel logging support (previously done by rklogd)
+{%- endif %}
+
+{%- if rsyslog.listen_udp %}
+$ModLoad imudp
+{%- if rsyslog.listen_udp_port is defined %}
+$UDPServerRun {{ port | default('514') }}
+{%- endif %}
+{%- endif %}
+
+{%- if rsyslog.listen_tcp %}
+$ModLoad imtcp
+{%- if rsyslog.listen_tcp_port is defined %}
+$InputTCPServerRun {{ rsyslog.listen_tcp_port | default('514') }}
+{%- endif %}
+{%- endif %}
+
+###########################
+#### GLOBAL DIRECTIVES ####
+###########################
+
+{%- if rsyslog.modlues is defined %}
+{%- if 'imjournal' in rsyslog.modules %}
+$WorkDirectory {{ rsyslog.work_directory }}
+{%- endif %}
+{%- endif %}
+
+$ActionFileDefaultTemplate RSYSLOG_TraditionalFileFormat
+
+$RepeatedMsgReduction on
+
+#
+# Set the default permissions for all log files.
+#
+$FileOwner {{ rsyslog.file_owner | default('root') }}
+$FileGroup {{ rsyslog.file_group | default('adm') }}
+$FileCreateMode {{ rsyslog.file_mode | default('0640') }}
+$DirCreateMode {{ rsyslog.dir_mode | default('0755') }}
+$Umask 0022
+$PrivDropToUser {{ rsyslog.priv_drop_to_user | default('syslog') }}
+$PrivDropToGroup {{ rsyslog.priv_drop_to_group | default('syslog') }}
+
+$WorkDirectory {{ rsyslog.work_directory | default('/var/spool/rsyslog') }}
+
+#
+# Include all config files in /etc/rsyslog.d/
+#
+$IncludeConfig /etc/rsyslog.d/*.conf
+
+
+{%- if rsyslog.targets is defined %}
+{%- for target in rsyslog.targets %}
+{%- if rsyslog.protocol == 'tcp' %}
+*.* @@{{ target }}
+{%- elif rsyslog.protocol == 'udp' %}
+*.* @{{ target }}
+{%- endif %}
+{%- endfor %}
+{%- endif %}

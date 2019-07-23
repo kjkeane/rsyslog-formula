@@ -1,22 +1,14 @@
 # -*- coding: utf-8 -*-
 # vim: ft=yaml
+---
 rsyslog:
-  package: rsyslog
-  module_packages:
-    gnutls: rsyslog-gnutls
-    elasticsearch: rsyslog-elasticsearch
-    gssapi: rsyslog-gssapi
-    kafka: rsyslog-kafka
-    mysql: rsyslog-mysql
-    pgsql: rsyslog-pgsql
-    relp: rsyslog-relp
-  service: rsyslog
-  runuser: root
-  rungroup: root
+  pkg:
+    name: rsyslog
+  service:
+    name: rsyslog
   config: /etc/rsyslog.conf
-  workdirectory: /var/spool/rsyslog
-  custom_config_path: /etc/rsyslog.d
-  exclusive: True
-  stoplist:
-    - syslogd
-  custom_config_template: salt://rsyslog/templates/rsyslog.conf.jinja
+  work_directory: /var/spool/rsyslog
+  include_dir: /etc/rsyslog.d
+  listen_udp: False
+  listen_tcp: False
+  protocol: udp

@@ -1,10 +1,45 @@
+# -*- coding: utf-8 -*-
+# vim: ft=yaml
+#
+# Setup variables using grains['os_family'] based logic.
+# You just need to add the key:values for an `os_family` that differ
+# from `defaults.yaml`.
+# Only add an `os_family` which is/will be supported by the formula
+#
+# If you do not need to provide defaults via the `os_family` grain,
+# you will need to provide at least an empty dict in this file, e.g.
+# osfamilymap: {}
+---
+
+Debian:
+  file_owner: root
+  file_group: adm
+  file_mode: 0640
+  dir_mode: 0755
+  priv_drop_to_user: syslog
+  priv_drop_to_group: syslog
+  work_directory: '/var/spool/rsyslog'
+  tofs:
+    files_switch:
+      - os_family
+
 RedHat:
-  workdirectory: /var/spool/rsyslog
+  work_directory: '/var/lib/rsyslog'
+  tofs:
+    files_switch:
+      - os_family
+
 FreeBSD:
   service: rsyslogd
   config: /usr/local/etc/rsyslog.conf
-  custom_config_path: /usr/local/etc/rsyslog.d
-  rungroup: wheel
+  include_dir: /usr/local/etc/rsyslog.d
+  group: wheel
+  tofs:
+    files_switch:
+      - os_family
+
 Gentoo:
-  rungroup: adm
-  package: app-admin/rsyslog
+  group: adm
+  pkg:
+    name: app-admin/rsyslog
+
