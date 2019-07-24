@@ -115,27 +115,24 @@ provisioner:
   salt_copy_filter:
     - .kitchen
     - .git
-  state_top:
-    base:
-      '*':
-        - rsyslog
-  pillars:
-    top.sls:
-      base:
-        '*':
-          - rsyslog
-  pillars_from_files:
-    template.sls: pillar.example
 
 verifier:
-  # https://www.inspec.io/
   name: inspec
   sudo: true
-  # cli, documentation, html, progress, json, json-min, json-rspec, junit
   reporter:
     - cli
-  inspec_tests:
-    - path: test/integration/default
-
+    
 suites:
   - name: default
+    provisioner:
+      state_top:
+        base:
+          '*':
+            - rsyslog
+      pillars:
+        top.sls:
+          base:
+            '*':
+              - rsyslog
+      pillars_from_files:
+        rsyslog.sls: pillar.example
