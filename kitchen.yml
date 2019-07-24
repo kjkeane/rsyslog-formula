@@ -111,23 +111,21 @@ provisioner:
   log_level: info
   salt_install: none
   require_chef: false
-  formula: template
+  formula: rsyslog
   salt_copy_filter:
     - .kitchen
     - .git
   state_top:
     base:
       '*':
-        - template
+        - rsyslog
   pillars:
     top.sls:
       base:
         '*':
-          - template
-          - define_roles
+          - rsyslog
   pillars_from_files:
     template.sls: pillar.example
-    define_roles.sls: test/salt/pillar/define_roles.sls
 
 verifier:
   # https://www.inspec.io/
