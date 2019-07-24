@@ -1,0 +1,12 @@
+name: rsyslog
+title: rsyslog formula
+maintainer: Kolin Keane
+license: Apache-2.0
+summary: Verify that the template formula is setup and configured correctly
+supports:
+  - platform-name: debian
+  - platform-name: ubuntu
+  - platform-name: centos
+  - platform-name: fedora
+  - platform-name: opensuse
+  - platform-name: suse
